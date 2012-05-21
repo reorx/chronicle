@@ -1,0 +1,24 @@
+!!! 5
+html
+  head
+    title - Chronicle I -
+    link(rel='stylesheet', href='css/index.css')
+    script(src='js/libs/require-jquery.js', data-main='js/index.js')
+  body
+    .wrapper
+      .header Chronicle
+      .main
+        #chronicle
+          .container
+            .yearline
+              .year.point.start
+              .year.point.end
+              //- .month.point(style='top: 20px')
+              //- .day.point(style='top: 50px')
+
+              .rulerpoint
+
+            .ruler(style="display: block; left: 450px; top: 0px; width: 205px; ")
+              .mousepoint
+
+    #debug(style='display: none')

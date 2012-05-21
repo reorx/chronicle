@@ -1,0 +1,27 @@
+JADE = $(shell find source/*.jade)
+HTML = $(JADE:.jade=.html)
+
+STYL = $(shell find source/styl/*.styl)
+CSS = $(STYL:.styl=.css)
+
+JS = $(shell find source/js/ -name "*.js")
+
+all: $(HTML) $(CSS) $(JS)
+
+%.html: %.jade
+	jade < $< > $@
+	mv $@ build/
+
+%.css: %.styl
+	stylus < $< > $@
+	mv $@ build/css/
+
+%.js:
+	cp $@ build/js/
+
+clean:
+	rm build/*.html
+	rm build/css/*.css
+	rm build/js/*.js
+
+.PHONY: clean
