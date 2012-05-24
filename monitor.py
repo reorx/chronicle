@@ -135,16 +135,17 @@ if '__main__' == __name__:
             # do things
             print 'Doing on change task'
 
-            for i in files:
-                if i.split('.')[-1] == 'jade':
-                    name = i.split('.')[-2].split('/')[-1]
-                    cmd = 'jade < %s > %s' % (i, 'build/' + name + '.html')
-                elif i.split('.')[-1] == 'styl':
-                    name = i.split('.')[-2].split('/')[-1]
-                    cmd = 'stylus < %s > %s' % (i, 'build/css/' + name + '.css')
+            #for i in files:
+                #if i.split('.')[-1] == 'jade':
+                    #name = i.split('.')[-2].split('/')[-1]
+                    #cmd = 'jade < %s > %s' % (i, 'build/' + name + '.html')
+                #elif i.split('.')[-1] == 'styl':
+                    #name = i.split('.')[-2].split('/')[-1]
+                    #cmd = 'stylus < %s > %s' % (i, 'build/css/' + name + '.css')
 
-                print cmd
-                os.system(cmd)
+                #print cmd
+                #os.system(cmd)
 
-            # os.system(cmd)
+            if files:
+                os.system('make')
         time.sleep(0.25)
