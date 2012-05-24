@@ -1,15 +1,18 @@
-require(['jquery','domReady'], function($, domReady) {
+require(['jquery','domReady', 'datehandlers'], function($, domReady, datehandlers) {
     domReady(function() {
 
-        var $DEBUG = $('#debug');
+        var CRNI = {};
 
+        /*
+         * Events
+         */
         $('#chronicle .container').bind('mousemove', function(e) {
             var $this = $(this),
                 ruler = $this.find('.ruler');
 
             // ignore events from .yearline
-            if ($(e.target).is(yearline.$el)) {
-                ruler.hide();
+            if ($(e.target).is(CRNI.yearline.$el)) {
+                ruler.css('display', 'none');
                 return;
             }
 
@@ -28,6 +31,7 @@ require(['jquery','domReady'], function($, domReady) {
                 halfWidth = containerWidth/2,
                 lineX = mpos.left - halfWidth;
             // console.log(lineX);
+
             if (lineX > 0) {
                 ruler.css({
                     top: mpos.top + 'px',
@@ -46,7 +50,6 @@ require(['jquery','domReady'], function($, domReady) {
                 ruler.css('display', 'none');
             }
 
-            // handle indicator
             // month indicate
             var rate = 1 - mpos.top/containerHeight;
             // fix overflow
@@ -54,73 +57,39 @@ require(['jquery','domReady'], function($, domReady) {
                 rate = 1;
             if (rate < 0)
                 rate = 0;
-            var yearHandler = new YearHandler(2012);
-            var o = yearHandler.get(rate);
-            $DEBUG.html(o.day + '|' + o.month + '|' + o.monthDay + '|' + yearHandler.yearDays + '|    ' + rate).show();
 
-            $this.data('o', o);
-            $this.data('mpos', mpos);
+            var o = CRNI.yearHandler.parse(rate);
 
+            CRNI.$date.html(o.date);
+
+            CRNI.o = o;
+            CRNI.mpos = mpos;
         });
+
         $('#chronicle .container').bind('click', function() {
             var $this = $(this),
-                o = $this.data('o'),
-                date = o.year + '-' + o.month + '-' + o.monthDay;
+                // o = $this.data('o'),
+                o = CRNI.o;
 
-            if (yearline.points[o.day]) {
-                console.log(yearline.points);
-                alert(date + 'already had !');
+            if (CRNI.yearline.points[o.day]) {
+                console.log(CRNI.yearline.points);
+                alert(o.date + 'already had !');
                 return;
             }
-            var content = prompt('==  Chapter ' + date + '  ==');
+            var content = prompt('==  Chapter ' + o.date + '  ==');
 
             if (content) {
-                yearline.add(o);
+                CRNI.yearline.add(o);
                 // alert('day/year ' + o.day + '/' + o.year + 'height' + $this.height() );
 
             }
 
         });
 
-        var YearHandler = function(year) {
-            if (typeof year !== 'number')
-                year = Number(year);
-            this.year = year;
-            this.yearDays = 0;
-            for (var i = 0;i < 12;i++) {
-                var monthDays = new Date(this.year, i, 0).getDate();
-                this.yearDays += monthDays;
-            }
-            this.get = function(rate) {
-                var dayRate = rate*this.yearDays,
-                    rateFloat = dayRate - Math.floor(dayRate),
-                    o = {},
-                    day, month, monthDay;
-                if (rateFloat > 0)
-                    day = Math.floor(dayRate) + 1;
-                else
-                    // determine for 0 specially, if dayRate is 0, day should be 1
-                    day = dayRate?dateRate:1;
-                // return day;
-                var diff = day;
-                for (var i = 0;i < 12;i++) {
-                    var monthDays = new Date(this.year, i + 1, 0).getDate();
-                    if ((diff - monthDays) <= 0) {
-                        month = i + 1;
-                        monthDay = diff;
-                        break;
-                    }
-                    diff = diff - monthDays;
-                }
-                o.year = this.year,
-                o.yearDays = this.yearDays,
-                o.day = day,
-                o.month = month,
-                o.monthDay = monthDay;
-                return o;
-            };
-        };
 
+        /*
+         * Classes
+         */
         var Yearline = function($el) {
             this.$el = $el;
             this.days = {};
@@ -138,28 +107,34 @@ require(['jquery','domReady'], function($, domReady) {
             };
         };
 
-        var yearline = new Yearline($('#chronicle .yearline'));
-
+        /*
+         * Functions
+         */
         function loadYearline(data) {
-            /*
-            data structure:
-                year: 2012
-                points
-                    date: 05-12
-                    content
-                day_periods
-                    from: 03-24
-                    to: 04-11
-                    content
-                month_periods
-                    from: 05-0
-                    to: 08-2
-                    content
-            */
-
-
+            CRNI.current_year = data.year;
+            CRNI.yearline = new Yearline($('#chronicle .yearline'));
+            CRNI.yearHandler = new datehandlers.Year(data.year);
+            CRNI.$date = $('#chronicle .decorates .date')
         }
 
+        /*
+         * Initialize
+         */
+        /*
+        data structure:
+            year: 2012
+            points
+                date: 05-12
+                content
+            day_periods
+                from: 03-24
+                to: 04-11
+                content
+            month_periods
+                from: 05-0
+                to: 08-2
+                content
+        */
         var fakeData = {
             year: 2012,
             points: [
@@ -183,5 +158,7 @@ require(['jquery','domReady'], function($, domReady) {
                 }
             ]
         };
+
+        loadYearline(fakeData);
     });
 });

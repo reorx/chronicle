@@ -6,14 +6,14 @@ CSS = $(shell find source/styl/ -name '*.styl' |\
 
 JS = $(shell find source/js/ -name '*.js' | sed -e 's/source\//build\//g')
 
-DIRS = build/css build/js build/
+DIRS = build/css build/js build
 
 all: $(DIRS) $(HTML) $(CSS) $(JS)
 
 build/css build/js: build
 	mkdir $@
 
-build/:
+build:
 	mkdir build
 
 build/%.html: source/%.jade
